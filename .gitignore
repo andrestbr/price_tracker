@@ -1,6 +1,7 @@
 __pycache__/
 __init__.py
 *.pyc
+.DS_Store
 amazon.code-workspace
 .vscode/
 data/
