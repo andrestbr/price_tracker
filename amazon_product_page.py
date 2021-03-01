@@ -32,6 +32,10 @@ class AmazonProductPage():
         self.product_seller_infos = None
         self.versand_durch_amazon = None
         self.kindle_edition = None
+        self.kindle_price = None
+        self.author = None
+        self.title = None
+        self.rauer_buchschnitt = None
         
         self.date = datetime.now().strftime('%Y-%m-%d')
 
@@ -45,6 +49,10 @@ class AmazonProductPage():
         self.get_product_seller_infos()
         self.check_shipping_infos()
         self.get_kindle_edition()
+        self.get_kindle_price()
+        self.get_author()
+        self.get_title()
+        self.check_edition()
         
     
     def request_product_page(self, url):
@@ -124,6 +132,50 @@ class AmazonProductPage():
             self.product_price = None
 
     
+    def get_author(self):
+        """ Get author infos """
+
+        r = self.bs4_object_product_page.find('a', class_='a-link-normal contributorNameID')
+        
+        if not r:
+            print('not text found for author')
+            return None
+
+        author = r.get_text(strip=True)
+        self.author = author
+
+    
+    def get_title(self):
+        """ Get title """
+
+        r = self.bs4_object_product_page.find('span', id='productTitle')
+        
+        if not r:
+            print('not text found for title')
+            return None
+        
+        title = r.get_text(strip=True).capitalize()
+        self.title = title
+
+    
+    def check_edition(self):
+        """ check edition """
+
+        r = self.bs4_object_product_page.find('span', id='productSubtitle')
+        
+        if not r:
+            print('not text found for more title information')
+            return None
+        
+        subtitle  = r.get_text(strip=True)
+        
+        match = re.compile('Rauer Buchschnitt').search(subtitle)
+        
+        if match:
+            print(f'{self.title}: schöne Edition')
+            self.rauer_buchschnitt = True
+
+        
     def get_kindle_edition(self):
         """ Get Kindle edition  """
         
@@ -155,6 +207,39 @@ class AmazonProductPage():
         except:
             print('kindle edition not found')
 
+
+    def get_kindle_price(self):
+        """ Get Kindle price  """
+        
+        try:
+            other_editions = self.bs4_object_product_page.find('span', class_="tmmShowPrompt", id="showMoreFormatsPrompt")
+            """ HTML:
+            
+            <a class="title-text" href="/Thinking-Fast-English-Daniel-Kahneman-ebook/dp/B00555X8OA/">
+                <span class="a-size-small a-color-base">Kindle</span>
+                <span class="tmmAjaxLoading" id="tmmSpinnerDiv_1" style="display: none"></span></a>, 
+            
+            <a class="title-text" href="/Thinking-Fast-and-Slow/dp/B00NTQ3QX0/">
+                <span class="a-size-small a-color-base">Audible Hörbuch, Ungekürzte Ausgabe</span>
+                <span class="tmmAjaxLoading" id="tmmSpinnerDiv_2" style="display: none"></span></a>, 
+            
+            <a class="title-text" href="/Daniel-Kahneman/dp/0141033576/">
+                <span class="a-size-small a-color-base">Taschenbuch</span>
+                <span class="tmmAjaxLoading" id="tmmSpinnerDiv_4" style="display: none"></span></a>
+            
+            """
+                        
+            kindle = other_editions.find_next('span', class_='a-size-small a-color-base', string='Kindle')
+                        
+            kindle_price_object = kindle.find_next('span', class_='a-size-small a-color-price')
+
+            kindle_price = get_price_from_bs4_object(kindle_price_object)
+                        
+            self.kindle_price = kindle_price
+
+        except:
+            print('kindle price not found')
+
                 
 #url = f'https://www.amazon.de/dp/3570103501'
 #id = '3570103501'
@@ -165,4 +250,6 @@ class AmazonProductPage():
 #print(amazon_product_page.product_seller_infos)
 #print(amazon_product_page.versand_durch_amazon)
 #print(amazon_product_page.kindle_edition)
-
+#print(amazon_product_page.title)
+#print(amazon_product_page.kindle_price)
+#print(amazon_product_page.check_edition())

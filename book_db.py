@@ -102,9 +102,9 @@ class BookDatabase():
         return True
         
                 
-#from settings import book_db_path
+#from settings import real_deal_paths
 
-#book_db = BookDatabase(book_db_path)
+#book_db = BookDatabase(real_deal_paths['books_path'])
 #book_db.add_book_to_db('0374275637')
 #book_db.add_book_to_db('3570103501')
 #book_db.add_book_to_db('')

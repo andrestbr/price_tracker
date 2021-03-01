@@ -11,6 +11,7 @@ amazon_used_product_page.py
 database_insights.py
 database_management.py
 
+db_infos.py
 find_amazon_book_in_goodreads.py
 get_id_from_url.py
 get_url_from_safari.py
